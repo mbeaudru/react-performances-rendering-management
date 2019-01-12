@@ -16,16 +16,17 @@ But wrongly used, you might end up having a hard to maintain / buggy codebase. W
 
 - One of the **props** the component receives have changed
 - A component **state** variable has been updated
+- It listens to a **context** variable that changes
 - The update is forced by the developer using _this.forceUpdate_ (class syntax)
 - Each time the **parent** that calls the component is being rendered
 
-We will see that the first three points are quite straightforward, but hang on because the last one is the reason I'm writing this article!
+We will see that the first four points are quite straightforward, but hang on because the last one is the reason I'm writing this article!
 
 ### Practical example: <Button />
 
 Let's figure out why Button re-renders when one of the above event happens:
 
-> **Note :** I'm omitting the _forceUpdate_ case here because it's quite uncommon, but if you want to know more about it just [read the React API docs](https://reactjs.org/docs/react-component.html#forceupdate).
+> **Note :** I'm omitting the _forceUpdate_ and _context_ cases in this example to simplify the reasoning, but if you want to know more about them just read [the forceContext API docs](https://reactjs.org/docs/react-component.html#forceupdate) and [React Context docs](https://reactjs.org/docs/context.html).
 
 _Button.js_
 
@@ -74,7 +75,7 @@ Our Button has an inner state _active_ which is a boolean used to determine whet
 
 At this point, you might be wondering:
 
-> **You, wondering :** _If the props remains the same and the inner state of the component has not changed, the component doesn't need to be re-rendered right ?_
+> **You, wondering :** _If the props, the inner state and the context of the component has not changed, the component doesn't need to be re-rendered right ?_
 
 Yup, totally ! **And yet**, even if your props and state haven't changed, React will make your components re-render each time the **parent** that calls your components is being rendered.
 
