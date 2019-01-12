@@ -1,4 +1,6 @@
-# Goal
+# React performances: rendering management
+
+## Goal
 
 When you are choosing React as your primary library for your application, you probably will want to know how to write efficient components and hooks to provide a good experience to your users.
 
@@ -8,7 +10,7 @@ You might have heard about `React.PureComponent` or `React.memo` which are indee
 
 But wrongly used, you might end up having a hard to maintain / buggy codebase. We will see how and when to use those tools in a minute!
 
-# When does a component re-renders ?
+## When does a component re-renders ?
 
 **By default**, a component will re-render if:
 
@@ -19,7 +21,7 @@ But wrongly used, you might end up having a hard to maintain / buggy codebase. W
 
 We will see that the first three points are quite straightforward, but hang on because the last one is the reason I'm writing this article!
 
-## Practical example: <Button />
+### Practical example: <Button />
 
 Let's figure out why Button re-renders when one of the above event happens:
 
@@ -68,7 +70,7 @@ Our _Button_ takes a color _prop_ which is used to determine the color of the bu
 
 Our Button has an inner state _active_ which is a boolean used to determine whether we should print _I am so actived right now!_ or _Not very active today..._ on screen. Again, whenever this property evolves React must update the DOM to reflect the changes, that's why our Button is re-rendered.
 
-## Parent re-renderings makes all children re-render
+### Parent re-renderings makes all children re-render
 
 At this point, you might be wondering:
 
@@ -76,7 +78,7 @@ At this point, you might be wondering:
 
 Yup, totally ! **And yet**, even if your props and state haven't changed, React will make your components re-render each time the **parent** that calls your components is being rendered.
 
-### ButtonGroup example
+#### ButtonGroup example
 
 To illustrate what a parent re-render means, let's use a <ButtonGroup /> that print our previous <Button /> multiple times. This component will have a state variable **counter** that will be displayed on screen.
 
@@ -117,17 +119,17 @@ class ButtonGroup extends React.Component {
 export default ButtonGroup;
 ```
 
-When you click on the _<h1> title_, the state variable _counter_ of <ButtonGroup /> will evolve and trigger a re-render of the component <ButtonGroup />. But not only ! All our <Button /> components will be re-rendered as well, even if their props haven't evolved and their inner state remains the same.
+When you click on the `<h1> title`, the state variable _counter_ of <ButtonGroup /> will evolve and trigger a re-render of the component <ButtonGroup />. But not only ! All our <Button /> components will be re-rendered as well, even if their props haven't evolved and their inner state remains the same.
 
 Sounds absurd and inefficient ? Well, let's dig in to understand why they made that choice and how you should deal with that in your code!
 
-# Props and state diffing
+## Props and state diffing
 
 To say that a prop or state variable has **changed** is more complex that it seems depending on the kind of variable we are dealing with.
 
-## Variables
+### Variables
 
-### Primitive variables
+#### Primitive variables
 
 List of _primitive_ variables (ref: [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types)):
 
@@ -147,7 +149,7 @@ const bar = 1;
 console.log(foo === bar); // true
 ```
 
-### "Object" variables
+#### "Object" variables
 
 In JavaScript, object variables are for instance:
 
@@ -166,13 +168,13 @@ const bar = {}; // creates another object with another reference Y in memory
 console.log(foo === bar); // false ! Despite having the same "values", the "===" operator only compares the in-memory references which are different (X and Y respectively)
 ```
 
-## React perspective
+### React perspective
 
 That being said, let's get back into our initial issue: why does React decides to re-render all the children components when the parent is being re-rendered ?
 
-**TL;DR :** There is no _generally_ applicable strategy for checking props / state changes, using React.PureComponent or React.Memo everywhere actually might harm performances and lead to bugs used without caution, while deep comparing objects is very costly and generally not a suitable option.
+**TL;DR :** There is no _generally_ applicable strategy for checking props / state changes, using *React.PureComponent* or *React.Memo* everywhere actually might harm performances and lead to bugs used without caution, while deep comparing objects is very costly and generally not a suitable option.
 
-### Object comparisons
+#### Object comparisons
 
 When it comes to rendering optimizations, React gives you two solutions:
 
@@ -186,7 +188,7 @@ Every time React is tempted to re-render (because of one of the events above) it
 
 Implements a _shouldComponentUpdate_ for you using a [_shallow comparison algorithm_](https://reactjs.org/docs/react-api.html#reactpurecomponent).
 
-#### Speed vs precision trade-off
+##### Speed vs precision trade-off
 
 As we've just seen, when we compare objects we in fact compare their references and not their values. Let's see what happens when you shallow compare props using a _PureComponent_
 
@@ -267,7 +269,7 @@ Indeed, your objects will probably have more keys / values than this and they mi
 
 There are [some libraries](https://github.com/FormidableLabs/react-fast-compare#do-i-need-shouldcomponentupdate) and techniques to deep compare two objects, but it comes at a cost that will totally defeat the initial purpose unless you use them very cautiously.
 
-# Conclusions
+## Conclusions
 
 Now that we've seen that performance optimizations couldn't be safely generalized and used with caution, here is my suggestion on how to manage react renderings in an application:
 
