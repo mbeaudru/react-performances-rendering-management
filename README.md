@@ -119,7 +119,7 @@ class ButtonGroup extends React.Component {
 export default ButtonGroup;
 ```
 
-When you click on the `<h1> title`, the state variable _counter_ of <ButtonGroup /> will evolve and trigger a re-render of the component <ButtonGroup />. But not only ! All our <Button /> components will be re-rendered as well, even if their props haven't evolved and their inner state remains the same.
+When you click on the `<h1> title`, the state variable _counter_ of <ButtonGroup /> will evolve and trigger a re-render of the component <ButtonGroup />. But not only ! All our `<Button />` components will be re-rendered as well, even if their props haven't evolved and their inner state remains the same.
 
 Sounds absurd and inefficient ? Well, let's dig in to understand why they made that choice and how you should deal with that in your code!
 
