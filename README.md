@@ -1,8 +1,8 @@
-# React performances: rendering management
+# React performances: how to manage re-renderings
 
 ## Goal
 
-When you are choosing React as your primary library for your application, you probably will want to know how to write efficient components and hooks to provide a good experience to your users.
+When you are choosing React as your primary library for your application, you probably will want to know how to write efficient components to provide a good experience to your users.
 
 There are many ways to improve your apps performances (images compressions, memoization, code splitting to name a few) but here we will try to focus on how to write your _components_ so that you can take advantage of React and not the opposite.
 
@@ -173,8 +173,6 @@ console.log(foo === bar); // false ! Despite having the same "values", the "==="
 
 That being said, let's get back into our initial issue: why does React decides to re-render all the children components when the parent is being re-rendered ?
 
-**TL;DR :** There is no _generally_ applicable strategy for checking props / state changes, using *React.PureComponent* or *React.Memo* everywhere actually might harm performances and lead to bugs used without caution, while deep comparing objects is very costly and generally not a suitable option.
-
 #### Object comparisons
 
 When it comes to rendering optimizations, React gives you two solutions:
@@ -270,6 +268,20 @@ Indeed, your objects will probably have more keys / values than this and they mi
 
 There are [some libraries](https://github.com/FormidableLabs/react-fast-compare#do-i-need-shouldcomponentupdate) and techniques to deep compare two objects, but it comes at a cost that will totally defeat the initial purpose unless you use them very cautiously.
 
+### To sum it up
+
+You don't want to use *React.PureComponent* / *React.memo* everywhere because:
+
+- **It might harm performances** if you create "Object" variables in the render and pass them by props, because it would always make the component re-render while making you pay the cost of state and props comparison
+- **It might create bugs**, if a prop variable is mutated in the parent the component might not re-render because it only shallow compares, which would break your app
+
+And you don't want to do deep "Object" comparisons either because it is quite costly.
+
+You might want to use *React.PureComponent* / *React.memo* sparingly:
+
+- When you have **measured** that useless and costly re-renders could be optimized
+- If you have *control* on how your component is used by the parent, no useless reference changes in the "Object" props nor mutations
+
 ## Conclusions
 
 Now that we've seen that performance optimizations couldn't be safely generalized and used with caution, here is my suggestion on how to manage react renderings in an application:
@@ -277,3 +289,7 @@ Now that we've seen that performance optimizations couldn't be safely generalize
 - First, write the most clear and maintainable code you can.
 - If you have a doubt on whether the re-renders are costly or not, **measure it** using the [devTools](https://reactjs.org/docs/optimizing-performance.html#profiling-components-with-the-chrome-performance-tab) before trying to optimize your code.
 - If you find out that some components are rendering too often and are costly, use `React.PureComponent` / `React.memo` or implement your own `shouldComponentUpdate` as a last resort.
+
+## If you liked this content
+
+You can encourage me to do more in appending a "Star" to this repo or following me on [Twitter @mbeaudru](https://twitter.com/mbeaudru) !
